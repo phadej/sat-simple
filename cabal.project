@@ -1,0 +1,9 @@
+packages: .
+
+tests: True
+
+package sat-simple
+  ghc-options: -Wall
+
+-- TODO
+allow-newer: unliftio-core:base
