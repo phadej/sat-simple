@@ -35,6 +35,8 @@ module Control.Monad.SAT (
     -- * Solving
     solve,
     solve_,
+    -- ** with assumptions
+    solveAssuming,
     -- * Simplification
     simplify,
     -- * Statistics
@@ -54,7 +56,10 @@ import Data.List               (tails)
 import Data.Map.Strict         (Map)
 import Data.Set                (Set)
 import GHC.Exts                (oneShot)
+import Data.Coerce (coerce)
+import Data.List.NonEmpty (NonEmpty)
 
+import qualified Data.List.NonEmpty as NE
 import qualified Data.Map.Strict as Map
 import qualified Data.Set        as Set
 import qualified MiniSat
@@ -540,6 +545,14 @@ solve model = SAT $ \s _t _r -> do
         case b of
             Nothing -> throwIO SATPanic
             Just b' -> return b'
+
+-------------------------------------------------------------------------------
+-- Solving with assumptions
+-------------------------------------------------------------------------------
+
+solveAssuming :: NonEmpty (Lit s) -> SAT s Bool
+solveAssuming ass = SAT $ \s _t _r -> do
+    MiniSat.solve s (coerce (NE.toList ass))
 
 -------------------------------------------------------------------------------
 -- Simplification

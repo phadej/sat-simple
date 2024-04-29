@@ -82,3 +82,12 @@ test-suite sat-simple-tseitin
   build-depends:
     , base
     , sat-simple
+
+test-suite sat-simple-assumptions
+  import:         language
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: examples
+  main-is:        sat-simple-assumptions.hs
+  build-depends:
+    , base
+    , sat-simple
