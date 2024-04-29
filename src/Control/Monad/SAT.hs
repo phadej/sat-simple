@@ -35,6 +35,9 @@ module Control.Monad.SAT (
     -- * Solving
     solve,
     solve_,
+    -- ** with assumptions
+    solveAssuming,
+    solveAssuming_,
     -- * Simplification
     simplify,
     -- * Statistics
@@ -49,14 +52,17 @@ import Control.Monad           (forM_, unless)
 import Control.Monad.IO.Class  (MonadIO (..))
 import Control.Monad.IO.Unlift (MonadUnliftIO (..))
 import Data.Bits               (shiftR, testBit)
+import Data.Coerce             (coerce)
 import Data.IORef              (IORef, newIORef, readIORef, writeIORef)
 import Data.List               (tails)
+import Data.List.NonEmpty      (NonEmpty)
 import Data.Map.Strict         (Map)
 import Data.Set                (Set)
 import GHC.Exts                (oneShot)
 
-import qualified Data.Map.Strict as Map
-import qualified Data.Set        as Set
+import qualified Data.List.NonEmpty as NE
+import qualified Data.Map.Strict    as Map
+import qualified Data.Set           as Set
 import qualified MiniSat
 
 -------------------------------------------------------------------------------
@@ -533,6 +539,34 @@ solve model = SAT $ \s _t _r -> do
     unless ok $ throwIO UnsatException
 
     traverse (getSym s) model
+  where
+    getSym :: MiniSat.Solver -> Lit s -> IO Bool
+    getSym s (L l) = do
+        b <- MiniSat.modelValue s l
+        case b of
+            Nothing -> throwIO SATPanic
+            Just b' -> return b'
+
+-------------------------------------------------------------------------------
+-- Solving with assumptions
+-------------------------------------------------------------------------------
+
+-- | Search with assumptions. Doesn't abort on unsat.
+--
+-- @since 0.1.1.0
+solveAssuming_ :: NonEmpty (Lit s) -> SAT s Bool
+solveAssuming_ ass = SAT $ \s _t _r -> do
+    MiniSat.solve s (coerce (NE.toList ass))
+
+-- | Search with assumptions and return a model. Doesn't abort on unsat.
+--
+-- @since 0.1.1.0
+solveAssuming :: Traversable model => model (Lit s) -> NonEmpty (Lit s) -> SAT s (Maybe (model Bool))
+solveAssuming model ass = SAT $ \s _t _r -> do
+    ok <- MiniSat.solve s (coerce (NE.toList ass))
+    if ok
+    then Just <$> traverse (getSym s) model
+    else pure Nothing
   where
     getSym :: MiniSat.Solver -> Lit s -> IO Bool
     getSym s (L l) = do
