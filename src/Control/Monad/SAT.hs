@@ -52,17 +52,17 @@ import Control.Monad           (forM_, unless)
 import Control.Monad.IO.Class  (MonadIO (..))
 import Control.Monad.IO.Unlift (MonadUnliftIO (..))
 import Data.Bits               (shiftR, testBit)
+import Data.Coerce             (coerce)
 import Data.IORef              (IORef, newIORef, readIORef, writeIORef)
 import Data.List               (tails)
+import Data.List.NonEmpty      (NonEmpty)
 import Data.Map.Strict         (Map)
 import Data.Set                (Set)
 import GHC.Exts                (oneShot)
-import Data.Coerce (coerce)
-import Data.List.NonEmpty (NonEmpty)
 
 import qualified Data.List.NonEmpty as NE
-import qualified Data.Map.Strict as Map
-import qualified Data.Set        as Set
+import qualified Data.Map.Strict    as Map
+import qualified Data.Set           as Set
 import qualified MiniSat
 
 -------------------------------------------------------------------------------
