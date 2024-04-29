@@ -1,6 +1,6 @@
 cabal-version:   2.4
 name:            sat-simple
-version:         0.1.0.0
+version:         0.1.1.0
 synopsis:        A high-level wrapper over minisat
 description:
   A high-level wrapper over minisat.

@@ -36,7 +36,7 @@ module Control.Monad.SAT (
     solve,
     solve_,
     -- ** with assumptions
-    solveAssuming,
+    solveAssuming_,
     -- * Simplification
     simplify,
     -- * Statistics
@@ -550,8 +550,8 @@ solve model = SAT $ \s _t _r -> do
 -- Solving with assumptions
 -------------------------------------------------------------------------------
 
-solveAssuming :: NonEmpty (Lit s) -> SAT s Bool
-solveAssuming ass = SAT $ \s _t _r -> do
+solveAssuming_ :: NonEmpty (Lit s) -> SAT s Bool
+solveAssuming_ ass = SAT $ \s _t _r -> do
     MiniSat.solve s (coerce (NE.toList ass))
 
 -------------------------------------------------------------------------------
