@@ -551,10 +551,12 @@ solve model = SAT $ \s _t _r -> do
 -- Solving with assumptions
 -------------------------------------------------------------------------------
 
+-- | Search with assumptions. Doesn't abort on unsat.
 solveAssuming_ :: NonEmpty (Lit s) -> SAT s Bool
 solveAssuming_ ass = SAT $ \s _t _r -> do
     MiniSat.solve s (coerce (NE.toList ass))
 
+-- | Search with assumptions and return a model. Doesn't abort on unsat.
 solveAssuming :: Traversable model => model (Lit s) -> NonEmpty (Lit s) -> SAT s (Maybe (model Bool))
 solveAssuming model ass = SAT $ \s _t _r -> do
     ok <- MiniSat.solve s (coerce (NE.toList ass))
