@@ -36,6 +36,7 @@ module Control.Monad.SAT (
     solve,
     solve_,
     -- ** with assumptions
+    solveAssuming,
     solveAssuming_,
     -- * Simplification
     simplify,
@@ -553,6 +554,20 @@ solve model = SAT $ \s _t _r -> do
 solveAssuming_ :: NonEmpty (Lit s) -> SAT s Bool
 solveAssuming_ ass = SAT $ \s _t _r -> do
     MiniSat.solve s (coerce (NE.toList ass))
+
+solveAssuming :: Traversable model => model (Lit s) -> NonEmpty (Lit s) -> SAT s (Maybe (model Bool))
+solveAssuming model ass = SAT $ \s _t _r -> do
+    ok <- MiniSat.solve s (coerce (NE.toList ass))
+    if ok
+    then Just <$> traverse (getSym s) model
+    else pure Nothing
+  where
+    getSym :: MiniSat.Solver -> Lit s -> IO Bool
+    getSym s (L l) = do
+        b <- MiniSat.modelValue s l
+        case b of
+            Nothing -> throwIO SATPanic
+            Just b' -> return b'
 
 -------------------------------------------------------------------------------
 -- Simplification

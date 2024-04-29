@@ -12,15 +12,23 @@ main = do
         addClause [q]
         addClause [r]
 
+        let model = [p,q,r]
+
         -- we can solve with assumptions
-        a1 <- solveAssuming_ (pure p)
-        a2 <- solveAssuming_ (pure (neg p))
-        b1 <- solveAssuming_ (pure q)
-        b2 <- solveAssuming_ (pure (neg q))
+        b1 <- solveAssuming_ (pure p)
+        b2 <- solveAssuming_ (pure (neg p))
+        b3 <- solveAssuming_ (pure q)
+        b4 <- solveAssuming_ (pure (neg q))
+
+        -- we can solve with assumptions and check the model
+        m1 <- solveAssuming model (pure p)
+        m2 <- solveAssuming model (pure (neg p))
+        m3 <- solveAssuming model (pure q)
+        m4 <- solveAssuming model (pure (neg q))
 
         -- and then solve the whole thing.
-        sol <- solve [p,q,r]
+        sol <- solve model
 
-        return ([a1, a2, b1, b2], sol)
+        return ([b1, b2, b3, b4], [m1,m2,m3,m4], sol)
 
     print res
