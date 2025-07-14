@@ -30,9 +30,11 @@ tested-with:
    || ==8.10.7
    || ==9.0.2
    || ==9.2.8
-   || ==9.4.7
-   || ==9.6.3
-   || ==9.8.1
+   || ==9.4.8
+   || ==9.6.7
+   || ==9.8.4
+   || ==9.10.2
+   || ==9.12.2
 
 common language
   default-language:   Haskell2010
@@ -50,8 +52,8 @@ library
   hs-source-dirs:  src
   exposed-modules: Control.Monad.SAT
   build-depends:
-    , base           >=4.12     && <4.20
-    , containers     ^>=0.6.0.1
+    , base           >=4.12     && <4.22
+    , containers     ^>=0.6.0.1 || ^>=0.7
     , minisat        ^>=0.1.3
     , unliftio-core  ^>=0.2.1.0
 
