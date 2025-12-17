@@ -28,8 +28,35 @@ main = do
         let stats = True
 
         m <- sudokuModel
-        sudokuRules m
         sudokuValues m initValues
+
+        do
+            sudokuRulesDigits m
+            sol <- solve m
+            liftIO $ do
+                putStrLn "Initial guess:"
+                putStr $ render $ decode sol
+
+        do
+            sudokuRulesRow m
+            sol <- solve m
+            liftIO $ do
+                putStrLn "Adding row rules:"
+                putStr $ render $ decode sol
+
+        do
+            sudokuRulesColumn m
+            sol <- solve m
+            liftIO $ do
+                putStrLn "Adding column rules:"
+                putStr $ render $ decode sol
+
+        do
+            sudokuRulesSub m
+            sol <- solve m
+            liftIO $ do
+                putStrLn "Adding subsquare rules:"
+                putStr $ render $ decode sol
 
         when stats $ do
             numberOfVariables >>= \n -> liftIO $ putStrLn $ "variables: " ++ show n
@@ -153,8 +180,15 @@ sudokuModel = traverse (\_ -> newLit) emptyModel
 -- | Sudoku rules.
 --
 -- Add constraints of the puzzle.
-sudokuRules :: Model (Lit s) -> SAT s ()
-sudokuRules model = do
+_sudokuRules :: Model (Lit s) -> SAT s ()
+_sudokuRules model = do
+    sudokuRulesDigits model
+    sudokuRulesRow model
+    sudokuRulesColumn model
+    sudokuRulesSub model
+
+sudokuRulesDigits :: Model (Lit s) -> SAT s ()
+sudokuRulesDigits model = do
     -- each "digit" is 1..9
     -- we encode digits using 9 bits.
     -- exactly one, i.e. at most one and and least one have to set.
@@ -162,23 +196,27 @@ sudokuRules model = do
         let lits = toList d
         assertAtMostOne lits
         assertAtLeastOne lits
+    
+-- With above digit encoding the sudoku rules are easy to encode:
+-- For each row we should have at least one 1, at least one 2, ... 9
+-- And similarly for columns and subsquares.
+--
+-- If we also require that each row, column and subsquare has at most one 1..9
+-- the given problem becomes trivial, as is solved by initial unit propagation.
 
-    -- With above digit encoding the sudoku rules are easy to encode:
-    -- For each row we should have at least one 1, at least one 2, ... 9
-    -- And similarly for columns and subsquares.
-    --
-    -- If we also require that each row, column and subsquare has at most one 1..9
-    -- the given problem becomes trivial, as is solved by initial unit propagation.
-
-    -- each row
+-- | each row
+sudokuRulesRow :: Model (Lit s) -> SAT s ()
+sudokuRulesRow model = do
     forRow_ model $ \block -> do
         let block' = sequenceA block
         for_ block' $ \d -> do
             let lits = toList d
             assertAtLeastOne lits
             -- assertAtMostOne lits
-
-     -- each column
+            
+-- | each column
+sudokuRulesColumn :: Model (Lit s) -> SAT s ()
+sudokuRulesColumn model = do
     forColumn_ model $ \block -> do
         let block' = sequenceA block
         for_ block' $ \d -> do
@@ -186,7 +224,9 @@ sudokuRules model = do
             assertAtLeastOne lits
             -- assertAtMostOne lits
 
-    -- each subsquare
+-- | each subsquare
+sudokuRulesSub :: Model (Lit s) -> SAT s ()
+sudokuRulesSub model = do
     forSubSq_ model $ \block -> do
         let block' = sequenceA block
         for_ block' $ \d -> do
