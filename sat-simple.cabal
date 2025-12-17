@@ -1,6 +1,6 @@
 cabal-version:   2.4
 name:            sat-simple
-version:         0.1.0.0
+version:         0.1.1.0
 synopsis:        A high-level wrapper over minisat
 description:
   A high-level wrapper over minisat.
@@ -81,6 +81,15 @@ test-suite sat-simple-tseitin
   type:           exitcode-stdio-1.0
   hs-source-dirs: examples
   main-is:        sat-simple-tseitin.hs
+  build-depends:
+    , base
+    , sat-simple
+
+test-suite sat-simple-assumptions
+  import:         language
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: examples
+  main-is:        sat-simple-assumptions.hs
   build-depends:
     , base
     , sat-simple
