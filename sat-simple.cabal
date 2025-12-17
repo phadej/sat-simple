@@ -66,6 +66,15 @@ test-suite sat-simple-sudoku
     , base
     , sat-simple
 
+test-suite sat-simple-sudoku-inc
+  import:         language
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: examples
+  main-is:        sat-simple-sudoku-inc.hs
+  build-depends:
+    , base
+    , sat-simple
+
 test-suite sat-simple-nonogram
   import:         language
   type:           exitcode-stdio-1.0
